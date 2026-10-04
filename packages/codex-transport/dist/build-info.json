@@ -1,0 +1,7 @@
+{
+  "upstreamPackage": "@earendil-works/pi-ai",
+  "upstreamVersion": "0.85.1",
+  "sourceSha256": "f5705d45ae72102110238d6265a548df3aef50b777f654f1f91a32d563c91b3e",
+  "patchSha256": "71ac960a3a0ea45a9fe3ee5c36c7026a5a313909bf89c1bea3eb95e2e294d404",
+  "bundleSha256": "2ff13eded542622be53e854456a49b508366f3d227c430a5cd2e229f8b40eed1"
+}

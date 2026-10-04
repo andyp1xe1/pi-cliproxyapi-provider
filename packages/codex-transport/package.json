@@ -1,0 +1,26 @@
+{
+	"name": "@andyp1xe1/cliproxyapi-codex-transport",
+	"version": "0.85.1-cpa.1",
+	"description": "Build-time patched pi-ai Codex transport for CLIProxyAPI",
+	"type": "module",
+	"license": "MIT",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"LICENSE",
+		"THIRD_PARTY_NOTICES.md"
+	],
+	"engines": {
+		"node": ">=22.19.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/andyp1xe1/pi-cliproxyapi-provider.git",
+		"directory": "packages/codex-transport"
+	}
+}

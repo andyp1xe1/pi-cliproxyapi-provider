@@ -1,6 +1,6 @@
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import type { Api, Model, SimpleStreamOptions } from "@earendil-works/pi-ai";
 import { type ExtensionAPI, type ExtensionContext, FooterComponent } from "@earendil-works/pi-coding-agent";
 import { describe, expect, it, vi } from "vitest";
@@ -8,8 +8,6 @@ import {
 	applyFastPayloadHook,
 	type CliproxyCodexStreamSimple,
 	loadCliproxyCodexStreams,
-	patchCodexSource,
-	resolveCodexModuleFromNodeEntry,
 	withPriorityServiceTier,
 	wrapStreamSimpleForFast,
 } from "../extensions/codex-stream.ts";
@@ -23,71 +21,7 @@ const model = {
 	provider: "cliproxyapi",
 } as Model<Api>;
 
-describe("Codex protocol module resolution", () => {
-	it("finds pi-ai nested beneath pi's bundled Node package", () => {
-		const root = realpathSync(mkdtempSync(join(tmpdir(), "pi-cliproxyapi-codex-resolution-test-")));
-		const cliEntry = join(root, "node_modules", "@earendil-works", "pi-coding-agent", "dist", "bundle", "cli.js");
-		const codexModule = join(
-			root,
-			"node_modules",
-			"@earendil-works",
-			"pi-coding-agent",
-			"node_modules",
-			"@earendil-works",
-			"pi-ai",
-			"dist",
-			"api",
-			"openai-codex-responses.js",
-		);
-
-		try {
-			mkdirSync(dirname(cliEntry), { recursive: true });
-			mkdirSync(dirname(codexModule), { recursive: true });
-			writeFileSync(cliEntry, "", "utf8");
-			writeFileSync(codexModule, "", "utf8");
-
-			expect(resolveCodexModuleFromNodeEntry(cliEntry)).toBe(codexModule);
-		} finally {
-			rmSync(root, { recursive: true, force: true });
-		}
-	});
-});
-
-describe("Codex WebSocket transport patch", () => {
-	it("falls back to SSE after exhausting WebSocket retries before stream start (Issue #33)", () => {
-		const source = readFileSync(
-			new URL("../node_modules/@earendil-works/pi-ai/dist/api/openai-codex-responses.js", import.meta.url),
-			"utf8",
-		);
-		const patched = patchCodexSource(source, ["cliproxyapi"]);
-
-		// WebSocket retries are still attempted before message stream start
-		expect(patched).toContain("let websocketRetries = 0;");
-		expect(patched).toContain("const maxWebSocketRetries = Number.isFinite(options?.maxRetries)");
-		expect(patched).toContain("? Math.min(Math.max(0, Math.floor(options.maxRetries)), 5)");
-		expect(patched).toContain(": 3;");
-
-		// When retries are exhausted before start, it must fall back to SSE instead of throwing
-		expect(patched).toContain('fallbackTransport: websocketStarted ? undefined : "sse"');
-		expect(patched).toContain("websocketSseFallbackSessions.add(sessionId);");
-		expect(patched).toMatch(/recordWebSocketSseFallback\([^)]*\);\s*break;/);
-		expect(patched).not.toContain("const websocketDisabledForSession = false;");
-		expect(patched).toContain("isWebSocketSseFallbackActive(");
-		expect(patched).toContain('(process.env.CLIPROXYAPI_TRANSPORT || options?.transport || "auto")');
-		expect(patched).toContain("export function closeOpenAICodexWebSocketSessions(sessionId)");
-	});
-
-	it("extends WebSocket idle TTL to 30 minutes to preserve implicit cache (Issue #33)", () => {
-		const source = readFileSync(
-			new URL("../node_modules/@earendil-works/pi-ai/dist/api/openai-codex-responses.js", import.meta.url),
-			"utf8",
-		);
-		const patched = patchCodexSource(source, ["cliproxyapi"]);
-
-		expect(patched).not.toContain("const SESSION_WEBSOCKET_CACHE_TTL_MS = 5 * 60 * 1000;");
-		expect(patched).toMatch(/SESSION_WEBSOCKET_CACHE_TTL_MS\s*=.*30\s*\*\s*60\s*\*\s*1000/);
-	});
-
+describe("Prebuilt Codex WebSocket transport", () => {
 	it("falls back to SSE fetch when WebSocket connect fails before start (Issue #33)", async () => {
 		const streams = await loadCliproxyCodexStreams(["cliproxyapi"]);
 		let fetchCalls = 0;

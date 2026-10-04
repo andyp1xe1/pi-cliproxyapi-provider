@@ -1,5 +1,8 @@
 node_modules/
 dist/
+# Ship the prebuilt companion package for production and git installs.
+!packages/codex-transport/dist/
+!packages/codex-transport/dist/**
 coverage/
 *.log
 .DS_Store

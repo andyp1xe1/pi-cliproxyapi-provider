@@ -26,6 +26,7 @@ import type {
 	SimpleStreamOptions,
 	StreamFunction,
 } from "@earendil-works/pi-ai";
+import { registerSessionResourceCleanup } from "@earendil-works/pi-ai";
 import { type ExtensionAPI, type ExtensionContext, getAgentDir } from "@earendil-works/pi-coding-agent";
 import { ProactiveCompactionController } from "./auto-compact.ts";
 import {
@@ -806,8 +807,13 @@ export default async function (pi: ExtensionAPI): Promise<void> {
 		});
 		proactiveCompaction.setCloseWebSocketSessions(streams.closeOpenAICodexWebSocketSessions);
 		streamSimple = proactiveCompaction.wrapStreamSimple(streams.streamSimple);
+		// Register with the host, not a second pi-ai instance bundled into the transport.
+		const unregisterSessionCleanup = registerSessionResourceCleanup((sessionId) =>
+			streams.closeOpenAICodexWebSocketSessions(sessionId),
+		);
 
 		pi.on("session_shutdown", () => {
+			unregisterSessionCleanup();
 			try {
 				streams.closeOpenAICodexWebSocketSessions();
 			} catch (error) {
@@ -890,7 +896,7 @@ export default async function (pi: ExtensionAPI): Promise<void> {
 		}
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
-		logWarn(`failed to load patched codex protocol: ${message}`);
+		logWarn(`failed to initialize bundled codex transport: ${message}`);
 	}
 
 	const fastFooter = new FastFooterController(identity.providerId, fastMode, () =>

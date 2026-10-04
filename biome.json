@@ -22,6 +22,14 @@
 		"lineWidth": 120
 	},
 	"files": {
-		"includes": ["extensions/**/*.ts", "test/**/*.ts", "*.json", "!node_modules"]
+		"includes": [
+			"extensions/**/*.ts",
+			"test/**/*.ts",
+			"scripts/**/*.mjs",
+			"packages/codex-transport/*.json",
+			"packages/codex-transport/*.d.ts",
+			"*.json",
+			"!node_modules"
+		]
 	}
 }

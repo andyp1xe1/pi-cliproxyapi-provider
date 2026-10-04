@@ -1,6 +1,6 @@
 {
-	"name": "@router-for-me/pi-cliproxyapi-provider",
-	"version": "1.4.21",
+	"name": "@andyp1xe1/pi-cliproxyapi-provider",
+	"version": "1.4.21-patched.1",
 	"description": "Pi provider extension that auto-registers CLIProxyAPI models, plus TUI elapsed/TPS status",
 	"type": "module",
 	"keywords": [
@@ -12,11 +12,11 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/router-for-me/pi-cliproxyapi-provider.git"
+		"url": "git+https://github.com/andyp1xe1/pi-cliproxyapi-provider.git"
 	},
-	"homepage": "https://github.com/router-for-me/pi-cliproxyapi-provider#readme",
+	"homepage": "https://github.com/andyp1xe1/pi-cliproxyapi-provider#readme",
 	"bugs": {
-		"url": "https://github.com/router-for-me/pi-cliproxyapi-provider/issues"
+		"url": "https://github.com/andyp1xe1/pi-cliproxyapi-provider/issues"
 	},
 	"publishConfig": {
 		"access": "public"
@@ -24,12 +24,24 @@
 	"engines": {
 		"node": ">=22.19.0"
 	},
+	"workspaces": [
+		"packages/codex-transport"
+	],
+	"dependencies": {
+		"@andyp1xe1/cliproxyapi-codex-transport": "file:packages/codex-transport"
+	},
+	"bundleDependencies": [
+		"@andyp1xe1/cliproxyapi-codex-transport"
+	],
 	"scripts": {
+		"build": "node scripts/build-transport.mjs",
+		"prepack": "npm run build",
 		"test": "vitest run",
+		"test:package": "node scripts/test-package.mjs",
 		"typecheck": "tsc --noEmit",
 		"lint": "biome check .",
 		"format": "biome check --write .",
-		"check": "npm run typecheck && npm run lint && npm run test"
+		"check": "npm run build && npm run typecheck && npm run lint && npm run test"
 	},
 	"pi": {
 		"extensions": [
@@ -38,19 +50,23 @@
 		]
 	},
 	"peerDependencies": {
-		"@earendil-works/pi-ai": "*",
-		"@earendil-works/pi-coding-agent": ">=0.82.0"
+		"@earendil-works/pi-ai": ">=0.85.1 <0.86.0",
+		"@earendil-works/pi-coding-agent": ">=0.85.1 <0.86.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.5.3",
-		"@earendil-works/pi-ai": "0.84.3",
-		"@earendil-works/pi-coding-agent": "0.84.3",
+		"@earendil-works/pi-ai": "0.85.1",
+		"@earendil-works/pi-coding-agent": "0.85.1",
+		"@andyp1xe1/pi-ai-source": "npm:@earendil-works/pi-ai@0.85.1",
+		"esbuild-wasm": "0.25.12",
 		"@types/node": "^22.15.21",
 		"typescript": "6.0.3",
 		"vitest": "4.1.9"
 	},
 	"files": [
 		"extensions",
+		"packages/codex-transport",
+		"FORK.md",
 		"README.md",
 		"LICENSE"
 	]

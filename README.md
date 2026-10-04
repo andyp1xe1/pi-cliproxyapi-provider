@@ -1,5 +1,10 @@
 # pi-cliproxyapi-provider
 
+This is the `andyp1xe1` fork of [router-for-me/pi-cliproxyapi-provider](https://github.com/router-for-me/pi-cliproxyapi-provider).
+It imports a prebuilt transport instead of locating and rewriting Pi's source at runtime.
+See [FORK.md](FORK.md) for installation, build instructions, and the supported Pi version range.
+The upstream documentation below describes the retained provider behavior.
+
 Pi provider extension that discovers models from [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) and registers them for use in pi. It supports catalog-driven OpenAI Fast mode and also ships a small TUI helper that shows elapsed runtime and a TPS summary after each agent turn.
 
 ## What it does
@@ -18,7 +23,8 @@ Pi provider extension that discovers models from [CLIProxyAPI](https://github.co
 
 ```bash
 # from npm
-pi install npm:@router-for-me/pi-cliproxyapi-provider
+# This fork is not published to npm. Use the local checkout:
+pi install /absolute/path/to/pi-cliproxyapi-provider
 
 # from a local checkout
 pi install /absolute/path/to/pi-cliproxyapi-provider
